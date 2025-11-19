@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whipple</title>
+  
+  <!-- Social Share / Open Graph Tags -->
+  <meta name="description" content="Whatever you do, get better." />
+  <meta property="og:title" content="Whipple" />
+  <meta property="og:description" content="Whatever you do, get better." />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root {
+      --bg: #dcd7ce; /* deeper off‑white */
+      --text: #1a1a1a;
+      --subtle: #555;
+    }
+
+    /* Smooth fade in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      text-align: center;
+      line-height: 1.6;
+      padding: 40px;
+      /* Apply animation */
+      opacity: 0; 
+      animation: fadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 26px;
+      font-weight: 600;
+      letter-spacing: -0.02em; /* Slightly tighter for an editorial look */
+    }
+
+    .line {
+      font-size: 22px;
+      margin: 8px 0;
+    }
+
+    .price {
+      margin-top: 30px;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .guarantee {
+      font-size: 15px;
+      color: var(--subtle);
+      margin-top: 4px;
+    }
+
+    .contact {
+      margin-top: 45px;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    /* Link Styling */
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    a:hover {
+      opacity: 0.6;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Whipple</h1>
+    <div class="line">Whatever you do, get better.</div>
+    <div class="line">90 minutes.</div>
+
+    <div class="price">$500</div>
+    <div class="guarantee">money back guaranteed</div>
+
+    <div class="contact">
+      James<br>
+      <!-- 'tel:' protocol allows one-tap dialing on mobile -->
+      <a href="tel:17084205462">708-420-5462</a>
+    </div>
+  </div>
+</body>
+</html>
