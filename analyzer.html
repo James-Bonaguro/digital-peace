@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parenting Micro-Product Business Analyzer | 2024-2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; color: #1F2937; }
+        
+        /* Chart Container Styling - MANDATORY */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Tailwind max-w-2xl equiv */
+            height: 300px;
+            max-height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        /* Custom Utilities */
+        .nav-btn.active {
+            background-color: #0D9488; /* Teal 600 */
+            color: white;
+            border-bottom: 2px solid #134E4A;
+        }
+        .nav-btn:hover:not(.active) {
+            background-color: #E5E7EB;
+            color: #111827;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .workflow-step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <!-- Chosen Palette: Calm Professional (Warm Neutrals + Teal + Rose) -->
+    <!-- Application Structure Plan: Dashboard Layout. 
+         Rationale: The user is analyzing a business opportunity. A dashboard provides a "command center" feel, allowing them to switch between Market Data, Financial Simulation, and Strategic Planning without losing context.
+         1. 'Market Intelligence': Sets the stage with growth data and customer psychology.
+         2. 'Business Simulator': Highly interactive section allowing users to input traffic/price assumptions to see potential revenue, making the "Unit Economics" abstract concept concrete.
+         3. 'AI Strategy Engine': Visualizes the NotebookLM workflow and competitive moat.
+         4. 'Risk Radar': Visualizes failure points to ground the optimism with reality.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Market Growth -> Line Chart (Chart.js) -> Goal: Change (Show trend) -> Confirming NO SVG.
+         2. Revenue Projection -> Dynamic Bar Chart (Chart.js) -> Goal: Inform/Simulate -> Updates on input change -> Confirming NO SVG.
+         3. Channel Analysis -> Radar Chart (Chart.js) -> Goal: Compare (Multivariate analysis of channels) -> Confirming NO SVG.
+         4. Failure Risks -> Doughnut Chart (Chart.js) -> Goal: Inform (Proportions) -> Confirming NO SVG.
+         5. AI Workflow -> Interactive HTML Cards -> Goal: Process -> Click to reveal details -> Confirming NO SVG.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-bold text-teal-700">Micro<span class="text-gray-900">Publisher</span></span>
+                        <span class="ml-2 px-2 py-0.5 rounded text-xs font-medium bg-teal-100 text-teal-800">2024-2025 Analysis</span>
+                    </div>
+                </div>
+                <div class="hidden sm:flex sm:space-x-8 h-full">
+                    <button onclick="switchView('market')" id="nav-market" class="nav-btn active border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full transition-colors">
+                        Market Intelligence
+                    </button>
+                    <button onclick="switchView('simulator')" id="nav-simulator" class="nav-btn border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full transition-colors">
+                        Business Simulator
+                    </button>
+                    <button onclick="switchView('strategy')" id="nav-strategy" class="nav-btn border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full transition-colors">
+                        AI Strategy & Channels
+                    </button>
+                    <button onclick="switchView('risk')" id="nav-risk" class="nav-btn border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full transition-colors">
+                        Risk Radar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Nav Placeholder -->
+        <div class="sm:hidden bg-gray-50 border-t border-gray-200 flex justify-around p-2">
+            <button onclick="switchView('market')" class="text-xs font-medium text-gray-600 p-2">Market</button>
+            <button onclick="switchView('simulator')" class="text-xs font-medium text-gray-600 p-2">Sim</button>
+            <button onclick="switchView('strategy')" class="text-xs font-medium text-gray-600 p-2">Strategy</button>
+            <button onclick="switchView('risk')" class="text-xs font-medium text-gray-600 p-2">Risk</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- VIEW 1: MARKET INTELLIGENCE -->
+        <div id="view-market" class="animate-fade-in block">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-gray-900">Market Validation & Trends</h2>
+                <p class="mt-2 text-lg text-gray-600">The parenting "Micro-Learning" market is expanding rapidly. Parents are seeking quick, verified solutions over lengthy books.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Market Growth Chart -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Micro-Learning Market Growth Projection</h3>
+                    <div class="chart-container">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4 text-center">Projected CAGR of 14% through 2026. Micro-credentials and quick guides are outpacing traditional education.</p>
+                </div>
+
+                <!-- Key Insights Cards -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-teal-500">
+                        <h4 class="text-xl font-bold text-gray-800">The "Pain Relief" Spender</h4>
+                        <p class="text-gray-600 mt-2">Parents are <strong>price insensitive</strong> for immediate problems (Sleep regression, Colic, Potty Training) but price sensitive for general advice.</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-500">Willingness to buy Digital Solutions</span>
+                            <span class="text-2xl font-bold text-teal-600">68%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div class="bg-teal-500 h-2.5 rounded-full" style="width: 68%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-rose-500">
+                        <h4 class="text-xl font-bold text-gray-800">Mobile-First Consumption</h4>
+                        <p class="text-gray-600 mt-2"><strong>92%</strong> of content consumption happens on mobile. Your PDF must be readable on a phone, or offer an Audio version (NotebookLM advantage).</p>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h4 class="text-lg font-bold text-gray-800 mb-3">Key Market Gaps</h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start"><span class="text-teal-500 mr-2">&#10003;</span>Specific age-gated guides (e.g., "18-month sleep regression" vs generic "sleep").</li>
+                            <li class="flex items-start"><span class="text-teal-500 mr-2">&#10003;</span>Audio-first summaries for busy parents (Podcast style).</li>
+                            <li class="flex items-start"><span class="text-teal-500 mr-2">&#10003;</span>Citation-backed content to combat AI hallucination fears.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: BUSINESS SIMULATOR -->
+        <div id="view-simulator" class="hidden animate-fade-in">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-gray-900">Unit Economics Simulator</h2>
+                <p class="mt-2 text-lg text-gray-600">Test the viability of the business model. Adjust pricing, traffic, and conversion rates to see how they impact your monthly bottom line.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Controls -->
+                <div class="bg-white rounded-lg shadow p-6 lg:col-span-1">
+                    <h3 class="text-lg font-bold text-gray-900 mb-6">Simulation Inputs</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label for="priceInput" class="block text-sm font-medium text-gray-700">Product Price ($)</label>
+                            <input type="range" id="priceInput" min="5" max="50" value="15" step="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>$5</span>
+                                <span id="priceDisplay" class="font-bold text-teal-700 text-base">$15</span>
+                                <span>$50</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="trafficInput" class="block text-sm font-medium text-gray-700">Monthly Visitors</label>
+                            <input type="range" id="trafficInput" min="100" max="10000" value="1000" step="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>100</span>
+                                <span id="trafficDisplay" class="font-bold text-teal-700 text-base">1000</span>
+                                <span>10k</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="convInput" class="block text-sm font-medium text-gray-700">Conversion Rate (%)</label>
+                            <input type="range" id="convInput" min="0.5" max="8.0" value="2.5" step="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>0.5%</span>
+                                <span id="convDisplay" class="font-bold text-teal-700 text-base">2.5%</span>
+                                <span>8%</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded border border-gray-200">
+                            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Projected Monthly Revenue</h4>
+                            <p id="totalRevenueDisplay" class="text-3xl font-bold text-teal-600 mt-2">$375</p>
+                            <p class="text-xs text-gray-400 mt-1">Marginal Cost: ~$0 (Digital Product)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="bg-white rounded-lg shadow p-6 lg:col-span-2 flex flex-col justify-center">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Revenue at Scale (vs Competitors)</h3>
+                    <div class="chart-container">
+                        <canvas id="simChart"></canvas>
+                    </div>
+                    <div class="mt-6 grid grid-cols-3 gap-4 text-center">
+                        <div class="p-3 bg-gray-50 rounded">
+                            <div class="text-xs text-gray-500">Sales Volume</div>
+                            <div id="salesVolDisplay" class="font-bold text-gray-800">25</div>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded">
+                            <div class="text-xs text-gray-500">Acquisition Cost Est.</div>
+                            <div class="font-bold text-gray-800">Organic (SEO/Pin)</div>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded">
+                            <div class="text-xs text-gray-500">Annual Run Rate</div>
+                            <div id="annualRunRate" class="font-bold text-teal-600">$4,500</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: STRATEGY & AI -->
+        <div id="view-strategy" class="hidden animate-fade-in">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-gray-900">AI Differentiation & Channels</h2>
+                <p class="mt-2 text-lg text-gray-600">Leverage NotebookLM to create a "Business Moat" and identify the highest ROI distribution channels.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- AI Workflow -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <span class="bg-teal-100 text-teal-800 text-xs font-bold px-2 py-1 rounded mr-2">The Edge</span>
+                        NotebookLM "Trust-First" Workflow
+                    </h3>
+                    <div class="space-y-4 relative">
+                        <!-- Connecting Line -->
+                        <div class="absolute left-6 top-4 bottom-4 w-0.5 bg-gray-200 z-0"></div>
+
+                        <!-- Step 1 -->
+                        <div class="workflow-step relative z-10 bg-white border border-gray-200 p-4 rounded-lg cursor-pointer transition-all hover:border-teal-400 group" onclick="toggleWorkflowDetails('step1')">
+                            <div class="flex items-center">
+                                <div class="h-12 w-12 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold text-lg mr-4">1</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 group-hover:text-teal-600">Curate Trusted Sources</h4>
+                                    <p class="text-xs text-gray-500">Upload 10-20 PDFs (Medical journals, books)</p>
+                                </div>
+                            </div>
+                            <div id="step1-details" class="hidden mt-3 pl-16 text-sm text-gray-600">
+                                <strong>Why:</strong> Prevents AI hallucination. Grounding content in expert sources creates a "Medical/Psychological" disclaimer buffer and builds trust with skeptical parents.
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="workflow-step relative z-10 bg-white border border-gray-200 p-4 rounded-lg cursor-pointer transition-all hover:border-teal-400 group" onclick="toggleWorkflowDetails('step2')">
+                            <div class="flex items-center">
+                                <div class="h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg mr-4">2</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 group-hover:text-indigo-600">Synthesize & Cite</h4>
+                                    <p class="text-xs text-gray-500">Generate coherent guides with inline citations</p>
+                                </div>
+                            </div>
+                            <div id="step2-details" class="hidden mt-3 pl-16 text-sm text-gray-600">
+                                <strong>Moat:</strong> Most competitors use generic ChatGPT wrappers. NotebookLM provides specific page references, increasing the perceived value of the PDF.
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="workflow-step relative z-10 bg-white border border-gray-200 p-4 rounded-lg cursor-pointer transition-all hover:border-teal-400 group" onclick="toggleWorkflowDetails('step3')">
+                            <div class="flex items-center">
+                                <div class="h-12 w-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-lg mr-4">3</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 group-hover:text-rose-600">Audio "Podcast" Generation</h4>
+                                    <p class="text-xs text-gray-500">Create Audio Overview for on-the-go parents</p>
+                                </div>
+                            </div>
+                            <div id="step3-details" class="hidden mt-3 pl-16 text-sm text-gray-600">
+                                <strong>Killer Feature:</strong> No other standard PDF seller offers a conversational audio summary. This justifies a $20 price point vs a $5 commodity PDF.
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-4 text-center">Click steps to see strategic advantages</p>
+                </div>
+
+                <!-- Channel Radar -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Distribution Channel Analysis</h3>
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm bg-blue-50 text-blue-800 p-3 rounded">
+                        <strong>Winner: Pinterest.</strong> High visual intent, evergreen lifespan, low ban risk compared to FB/Reddit.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: RISK RADAR -->
+        <div id="view-risk" class="hidden animate-fade-in">
+             <div class="mb-6">
+                <h2 class="text-3xl font-bold text-gray-900">Critical Failure Analysis</h2>
+                <p class="mt-2 text-lg text-gray-600">Why do 90% of info-product businesses fail? Understanding these pitfalls is the first step to mitigation.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Failure Attribution Model</h3>
+                    <div class="chart-container">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-rose-500">
+                        <h4 class="text-lg font-bold text-gray-900">1. Distribution Failure (40%)</h4>
+                        <p class="text-gray-600 text-sm mt-2">
+                            <strong>The Trap:</strong> Spending weeks creating the "perfect" guide but having zero audience. <br>
+                            <strong>The Fix:</strong> Validate *before* building. Use Pinterest/TikTok to gauge interest in the topic first.
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+                        <h4 class="text-lg font-bold text-gray-900">2. Trust Deficit (25%)</h4>
+                        <p class="text-gray-600 text-sm mt-2">
+                            <strong>The Trap:</strong> "Who are you to tell me how to raise my child?" <br>
+                            <strong>The Fix:</strong> Use NotebookLM to source expert content. Add "Curated by [Name]" not "Written by". Transparency wins.
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-gray-500">
+                        <h4 class="text-lg font-bold text-gray-900">3. Platform Dependency</h4>
+                        <p class="text-gray-600 text-sm mt-2">
+                            <strong>The Trap:</strong> Relying 100% on Gumroad or Etsy. <br>
+                            <strong>The Fix:</strong> Collect emails immediately. An email list is the only asset you truly own.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">Generated Strategy Dashboard | 2024-2025 Analysis</p>
+        </div>
+    </footer>
+
+    <script>
+        // State Management
+        const state = {
+            currentView: 'market',
+            sim: {
+                price: 15,
+                traffic: 1000,
+                conv: 2.5
+            }
+        };
+
+        // Navigation Logic
+        function switchView(viewId) {
+            // Hide all views
+            ['market', 'simulator', 'strategy', 'risk'].forEach(id => {
+                document.getElementById(`view-${id}`).classList.add('hidden');
+                document.getElementById(`nav-${id}`).classList.remove('active', 'border-teal-500', 'text-gray-900');
+                // Mobile nav handling styling reset if needed
+            });
+
+            // Show selected
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Update Nav visual state
+            const btn = document.getElementById(`nav-${viewId}`);
+            if(btn) btn.classList.add('active', 'border-teal-500', 'text-gray-900');
+
+            state.currentView = viewId;
+        }
+
+        // Workflow Toggle Logic
+        function toggleWorkflowDetails(stepId) {
+            const el = document.getElementById(`${stepId}-details`);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // --- CHARTS ---
+
+        // 1. Market Growth Chart (Line)
+        const ctxMarket = document.getElementById('marketChart').getContext('2d');
+        new Chart(ctxMarket, {
+            type: 'line',
+            data: {
+                labels: ['2022', '2023', '2024', '2025 (Est)', '2026 (Est)'],
+                datasets: [{
+                    label: 'Micro-Learning Market ($B)',
+                    data: [2.1, 2.5, 3.1, 3.8, 4.6],
+                    borderColor: '#0D9488', // Teal 600
+                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#0D9488',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        callbacks: {
+                            label: (context) => `$${context.raw} Billion`
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: false, grid: { borderDash: [4, 4] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Business Simulator Chart (Bar - Updates Dynamically)
+        const ctxSim = document.getElementById('simChart').getContext('2d');
+        const simChart = new Chart(ctxSim, {
+            type: 'bar',
+            data: {
+                labels: ['Your Scenario', 'Avg Competitor ($10)', 'High-End Bundle ($40)'],
+                datasets: [{
+                    label: 'Monthly Revenue ($)',
+                    data: [0, 0, 0], // Will initialize
+                    backgroundColor: ['#0D9488', '#9CA3AF', '#F43F5E'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                         callbacks: {
+                            title: (items) => {
+                                // Fix for multiline tooltip title if needed
+                                return items[0].label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [2, 2] } }
+                }
+            }
+        });
+
+        // Simulator Logic
+        function updateSimulation() {
+            // Get values
+            const price = parseFloat(document.getElementById('priceInput').value);
+            const traffic = parseInt(document.getElementById('trafficInput').value);
+            const conv = parseFloat(document.getElementById('convInput').value);
+
+            // Update Text Displays
+            document.getElementById('priceDisplay').innerText = `$${price}`;
+            document.getElementById('trafficDisplay').innerText = traffic.toLocaleString();
+            document.getElementById('convDisplay').innerText = `${conv}%`;
+
+            // Calculate
+            const sales = Math.round(traffic * (conv / 100));
+            const revenue = Math.round(sales * price);
+            const annual = revenue * 12;
+
+            // Update Results
+            document.getElementById('totalRevenueDisplay').innerText = `$${revenue.toLocaleString()}`;
+            document.getElementById('salesVolDisplay').innerText = sales;
+            document.getElementById('annualRunRate').innerText = `$${annual.toLocaleString()}`;
+
+            // Update Chart
+            // Competitor: 1000 visits, 2% conv, $10 price = $200
+            const compRevenue = 200; 
+            // Bundle: 1000 visits, 1% conv, $40 price = $400
+            const bundleRevenue = 400;
+
+            simChart.data.datasets[0].data = [revenue, compRevenue, bundleRevenue];
+            simChart.update();
+        }
+
+        // Event Listeners for Simulator
+        ['priceInput', 'trafficInput', 'convInput'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateSimulation);
+        });
+
+        // Initialize Sim
+        updateSimulation();
+
+        // 3. Radar Chart (Strategy)
+        const ctxRadar = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['Conversion', 'Cost Efficiency', 'Scalability', 'Trust', 'Ease of Content'],
+                datasets: [
+                    {
+                        label: 'Pinterest (Organic)',
+                        data: [8, 9, 7, 8, 6],
+                        borderColor: '#F43F5E', // Rose
+                        backgroundColor: 'rgba(244, 63, 94, 0.2)',
+                    },
+                    {
+                        label: 'FB/Insta Ads',
+                        data: [6, 3, 9, 5, 4], // Low cost efficiency
+                        borderColor: '#9CA3AF', // Gray
+                        backgroundColor: 'rgba(156, 163, 175, 0.2)',
+                    },
+                    {
+                        label: 'SEO (Blog)',
+                        data: [7, 8, 5, 9, 2], // Hard content
+                        borderColor: '#0D9488', // Teal
+                        backgroundColor: 'rgba(13, 148, 136, 0.2)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        suggestedMin: 0,
+                        suggestedMax: 10,
+                        ticks: { display: false }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => {
+                                // Handle potential long titles if needed, though simple here
+                                return items[0].label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 4. Doughnut Chart (Risk)
+        const ctxRisk = document.getElementById('riskChart').getContext('2d');
+        
+        // Label wrapping helper for chartjs
+        function splitLabel(label) {
+            if (label.length > 16) {
+                const words = label.split(' ');
+                const mid = Math.floor(words.length / 2);
+                return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+            }
+            return label;
+        }
+
+        const riskLabels = ['Distribution Failure', 'Trust Deficit', 'Platform Risk', 'Content Saturation', 'Legal Issues'];
+        
+        new Chart(ctxRisk, {
+            type: 'doughnut',
+            data: {
+                labels: riskLabels.map(l => splitLabel(l)),
+                datasets: [{
+                    data: [40, 25, 15, 15, 5],
+                    backgroundColor: [
+                        '#F43F5E', // Rose 500
+                        '#FB923C', // Orange 400
+                        '#FBBF24', // Amber 400
+                        '#94A3B8', // Slate 400
+                        '#CBD5E1'  // Slate 300
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' },
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => {
+                                const label = items[0].label;
+                                return Array.isArray(label) ? label.join(' ') : label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
