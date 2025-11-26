@@ -6,3 +6,4 @@ Here are the live tools:
 Overview of market trends and opportunities.
 
 [Busines Strategy Simulator](https://james-bonaguro.github.io/whipple/analyzer.html)
+Interactive dashboard to test pricing and revenue models.
