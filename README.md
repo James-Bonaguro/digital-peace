@@ -10,3 +10,6 @@ Interactive dashboard to test pricing and revenue models.
 
 [View Live Demo](https://james-bonaguro.github.io/digital-peace/)
 The final landing page for the product.
+
+[Arbitrage Framework](https://james-bonaguro.github.io/digital-peace/arbitrage.html)
+Pinterest Arbitrage Framework
